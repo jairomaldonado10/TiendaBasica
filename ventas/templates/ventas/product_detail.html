@@ -1,0 +1,10 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h4 mb-3">Detalle</h1>
+<ul class="list-group mb-3">
+  <li class="list-group-item"><b>SKU:</b> {{ obj.sku }}</li>
+  <li class="list-group-item"><b>Nombre:</b> {{ obj.nombre }}</li>
+  <li class="list-group-item"><b>Precio:</b> ${{ obj.precio }}</li>
+  <li class="list-group-item"><b>Stock:</b> {{ obj.stock }}</li>
+</ul>
+<a class="btn btn-outline-secondary" href="{% url 'ventas:product_list' %}">Volver</a>
+{% endblock %}

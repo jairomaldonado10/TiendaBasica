@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**": "django-html"
+  },
+  "emmet.includeLanguages": { "django-html": "html" },
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "[django-html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  }
+}

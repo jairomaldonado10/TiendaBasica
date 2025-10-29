@@ -1,0 +1,17 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h4 mb-3">Venta #{{ obj.id }}</h1>
+<p><b>Cliente:</b> {{ obj.cliente }}</p>
+<p><b>Fecha:</b> {{ obj.fecha }}</p>
+<p><b>Total:</b> ${{ obj.total }}</p>
+<table class="table table-sm align-middle">
+  <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+  <tbody>
+  {% for d in obj.detalle_set.all %}
+  <tr>
+    <td>{{ d.producto }}</td><td>{{ d.cantidad }}</td><td>${{ d.precio_unitario }}</td><td>${{ d.subtotal }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a class="btn btn-outline-secondary" href="{% url 'ventas:venta_list' %}">Volver</a>
+{% endblock %}

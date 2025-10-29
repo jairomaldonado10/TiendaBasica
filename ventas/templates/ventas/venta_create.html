@@ -1,0 +1,29 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h4 mb-3">Nueva venta</h1>
+<form method="post">{% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Cliente</label>
+    <select name="cliente" class="form-select">
+      {% for c in clientes %}<option value="{{ c.id }}">{{ c.nombre }} - {{ c.rut }}</option>{% endfor %}
+    </select>
+  </div>
+  {{ formset.management_form }}
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Eliminar</th></tr></thead>
+    <tbody>
+      {% for f in formset.forms %}
+      <tr>
+        <td>{{ f.producto }}</td>
+        <td>{{ f.cantidad }}</td>
+        <td>{{ f.precio_unitario }}</td>
+        <td class="text-center">{% if f.instance.pk %}{{ f.DELETE }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="d-flex gap-2">
+    <button class="btn btn-success">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{% url 'ventas:venta_list' %}">Volver</a>
+  </div>
+</form>
+{% endblock %}
