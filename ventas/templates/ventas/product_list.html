@@ -1,21 +1,22 @@
 {% extends 'ventas/base.html' %}{% block content %}
-<h1 class="h4 mb-3">Productos</h1>
-<form class="row g-2 mb-3" method="get">
-  <div class="col-auto"><input class="form-control" name="q" value="{{ q|default:'' }}" placeholder="Buscar"></div>
-  <div class="col-auto"><button class="btn btn-secondary">Buscar</button></div>
-</form>
+<h1 class="h4 mb-3">Ventas</h1>
 <table class="table table-sm table-striped align-middle">
-<thead><tr><th>SKU</th><th>Nombre</th><th>Precio</th><th>Stock</th><th></th></tr></thead>
-<tbody>
-{% for p in page.object_list %}
-<tr>
-  <td>{{ p.sku }}</td><td>{{ p.nombre }}</td><td>${{ p.precio }}</td><td>{{ p.stock }}</td>
-  <td class="text-nowrap">
-    <a class="btn btn-sm btn-outline-secondary" href="{% url 'ventas:product_detail' p.id %}">Ver</a>
-    <a class="btn btn-sm btn-outline-primary" href="{% url 'ventas:product_update' p.id %}">Editar</a>
-    <a class="btn btn-sm btn-outline-danger" href="{% url 'ventas:product_delete' p.id %}">Eliminar</a>
-  </td>
-</tr>
-{% empty %}<tr><td colspan="5">Sin datos</td></tr>{% endfor %}
-</tbody></table>
+  <thead><tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Total</th><th></th></tr></thead>
+  <tbody>
+  {% for v in page.object_list %}
+  <tr>
+    <td>{{ v.id }}</td>
+    <td>{{ v.cliente }}</td>
+    <td>{{ v.fecha }}</td>
+    <td>${{ v.total }}</td>
+    <td class="text-nowrap">
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'ventas:venta_detail' v.id %}">Ver</a>
+      <a class="btn btn-sm btn-outline-danger" href="{% url 'ventas:venta_delete' v.id %}">Eliminar</a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="5">Sin ventas</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

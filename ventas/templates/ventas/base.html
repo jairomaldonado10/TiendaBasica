@@ -10,15 +10,15 @@
   <nav class="mb-3 d-flex gap-2">
     <a class="btn btn-outline-secondary" href="{% url 'ventas:product_list' %}">Productos</a>
     <a class="btn btn-outline-secondary" href="{% url 'ventas:venta_list' %}">Ventas</a>
+    <a class="btn btn-outline-secondary" href="{% url 'ventas:cliente_list' %}">Clientes</a>
     <a class="btn btn-primary" href="{% url 'ventas:product_create' %}">Nuevo producto</a>
     <a class="btn btn-success" href="{% url 'ventas:venta_create' %}">Nueva venta</a>
+    <a class="btn btn-primary" href="{% url 'ventas:cliente_create' %}">Nuevo cliente</a>
   </nav>
-
   <main class="container">
     {% if messages %}{% for m in messages %}
       <div class="alert alert-{{ m.tags|default:'secondary' }} py-2 my-1">{{ m }}</div>
     {% endfor %}{% endif %}
-
     {% block content %}{% endblock %}
   </main>
 </body>

@@ -1,0 +1,8 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h5 mb-3">Eliminar cliente</h1>
+<p>¿Eliminar <b>{{ obj.nombre }}</b> ({{ obj.rut }})?</p>
+<form method="post">{% csrf_token %}
+  <button class="btn btn-danger">Eliminar</button>
+  <a class="btn btn-outline-secondary" href="{% url 'ventas:cliente_list' %}">Cancelar</a>
+</form>
+{% endblock %}

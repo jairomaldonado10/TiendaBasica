@@ -1,0 +1,21 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h4 mb-3">Cliente</h1>
+<form method="post" class="row g-3">{% csrf_token %}
+  <div class="col-md-6">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" name="nombre" value="{{ form.instance.nombre|default_if_none:'' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">RUT</label>
+    <input class="form-control" name="rut" value="{{ form.instance.rut|default_if_none:'' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Email</label>
+    <input type="email" class="form-control" name="email" value="{{ form.instance.email|default_if_none:'' }}">
+  </div>
+  <div class="col-12 d-flex gap-2">
+    <button class="btn btn-primary">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{% url 'ventas:cliente_list' %}">Volver</a>
+  </div>
+</form>
+{% endblock %}

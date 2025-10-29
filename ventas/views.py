@@ -5,11 +5,11 @@ from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from .models import Producto, Cliente, Venta
-from .forms import DetalleFormSet
+from .forms import DetalleFormSet, ClienteForm
 
 def product_list(request):
     q = request.GET.get("q", "")
-    qs = Producto.objects.all()
+    qs = Producto.objects.filter(activo=True) if hasattr(Producto, "activo") else Producto.objects.all()
     if q:
         qs = qs.filter(nombre__icontains=q)
     page = Paginator(qs.order_by("-id"), 10).get_page(request.GET.get("page"))
@@ -26,7 +26,10 @@ def product_create(request):
             ctx = {"form": SimpleNamespace(nombre=nombre, sku=sku, precio=precio, stock=stock)}
             return render(request, "ventas/product_form.html", ctx)
         try:
-            Producto.objects.create(nombre=nombre, sku=sku, precio=precio, stock=stock)
+            if hasattr(Producto, "activo"):
+                Producto.objects.create(nombre=nombre, sku=sku, precio=precio, stock=stock, activo=True)
+            else:
+                Producto.objects.create(nombre=nombre, sku=sku, precio=precio, stock=stock)
         except IntegrityError:
             messages.error(request, "SKU duplicado")
             ctx = {"form": SimpleNamespace(nombre=nombre, sku=sku, precio=precio, stock=stock)}
@@ -37,11 +40,11 @@ def product_create(request):
     return render(request, "ventas/product_form.html", ctx)
 
 def product_detail(request, pk):
-    obj = get_object_or_404(Producto, pk=pk)
+    obj = get_object_or_404(Producto, pk=pk, activo=True) if hasattr(Producto, "activo") else get_object_or_404(Producto, pk=pk)
     return render(request, "ventas/product_detail.html", {"obj": obj})
 
 def product_update(request, pk):
-    obj = get_object_or_404(Producto, pk=pk)
+    obj = get_object_or_404(Producto, pk=pk, activo=True) if hasattr(Producto, "activo") else get_object_or_404(Producto, pk=pk)
     if request.method == "POST":
         nombre = (request.POST.get("nombre") or "").strip()
         sku = (request.POST.get("sku") or "").strip().upper()
@@ -50,10 +53,7 @@ def product_update(request, pk):
         if not nombre or not sku or precio < 0 or stock < 0:
             messages.error(request, "Datos inválidos")
             return render(request, "ventas/product_form.html", {"form": obj})
-        obj.nombre = nombre
-        obj.sku = sku
-        obj.precio = precio
-        obj.stock = stock
+        obj.nombre, obj.sku, obj.precio, obj.stock = nombre, sku, precio, stock
         try:
             obj.save()
         except IntegrityError:
@@ -70,7 +70,12 @@ def product_delete(request, pk):
             obj.delete()
             messages.success(request, "Producto eliminado")
         except ProtectedError:
-            messages.error(request, "No se puede eliminar: el producto está usado en ventas")
+            if hasattr(obj, "activo"):
+                obj.activo = False
+                obj.save(update_fields=["activo"])
+                messages.info(request, "Producto archivado porque tiene ventas asociadas")
+            else:
+                messages.error(request, "No se puede eliminar: el producto está usado en ventas")
         return redirect("ventas:product_list")
     return render(request, "ventas/product_delete.html", {"obj": obj})
 
@@ -105,5 +110,63 @@ def venta_create(request):
     return render(request, "ventas/venta_create.html", {"clientes": Cliente.objects.order_by("nombre"), "formset": formset})
 
 def venta_detail(request, pk):
-    obj = get_object_or_404(Venta, pk=pk)
+    obj = Venta.objects.filter(pk=pk).first()
+    if not obj:
+        messages.error(request, "La venta no existe")
+        return redirect("ventas:venta_list")
     return render(request, "ventas/venta_detail.html", {"obj": obj})
+
+def venta_delete(request, pk):
+    obj = Venta.objects.filter(pk=pk).first()
+    if not obj:
+        messages.error(request, "La venta no existe")
+        return redirect("ventas:venta_list")
+    if request.method == "POST":
+        obj.delete()
+        messages.success(request, "Venta eliminada")
+        return redirect("ventas:venta_list")
+    return render(request, "ventas/venta_delete.html", {"obj": obj})
+
+def cliente_list(request):
+    q = request.GET.get("q", "")
+    qs = Cliente.objects.all()
+    if q:
+        qs = qs.filter(nombre__icontains=q)
+    page = Paginator(qs.order_by("nombre"), 10).get_page(request.GET.get("page"))
+    return render(request, "ventas/cliente_list.html", {"page": page, "q": q})
+
+def cliente_create(request):
+    if request.method == "POST":
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cliente creado")
+            return redirect("ventas:cliente_list")
+        messages.error(request, "Revisa los datos")
+    else:
+        form = ClienteForm()
+    return render(request, "ventas/cliente_form.html", {"form": form})
+
+def cliente_update(request, pk):
+    obj = get_object_or_404(Cliente, pk=pk)
+    if request.method == "POST":
+        form = ClienteForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cliente actualizado")
+            return redirect("ventas:cliente_list")
+        messages.error(request, "Revisa los datos")
+    else:
+        form = ClienteForm(instance=obj)
+    return render(request, "ventas/cliente_form.html", {"form": form})
+
+def cliente_delete(request, pk):
+    obj = get_object_or_404(Cliente, pk=pk)
+    if request.method == "POST":
+        try:
+            obj.delete()
+            messages.success(request, "Cliente eliminado")
+        except ProtectedError:
+            messages.error(request, "No se puede eliminar: el cliente tiene ventas asociadas")
+        return redirect("ventas:cliente_list")
+    return render(request, "ventas/cliente_delete.html", {"obj": obj})

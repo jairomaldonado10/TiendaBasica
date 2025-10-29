@@ -1,0 +1,8 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h5 mb-3">Eliminar venta</h1>
+<p>¿Eliminar la venta #{{ obj.id }} de <b>{{ obj.cliente }}</b> por ${{ obj.total }}?</p>
+<form method="post">{% csrf_token %}
+  <button class="btn btn-danger">Eliminar</button>
+  <a class="btn btn-outline-secondary" href="{% url 'ventas:venta_list' %}">Cancelar</a>
+</form>
+{% endblock %}

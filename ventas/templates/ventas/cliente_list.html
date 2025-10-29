@@ -1,0 +1,24 @@
+{% extends 'ventas/base.html' %}{% block content %}
+<h1 class="h4 mb-3">Clientes</h1>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-auto"><input class="form-control" name="q" value="{{ q|default:'' }}" placeholder="Buscar cliente"></div>
+  <div class="col-auto"><button class="btn btn-secondary">Buscar</button></div>
+  <div class="col-auto"><a class="btn btn-primary" href="{% url 'ventas:cliente_create' %}">Nuevo cliente</a></div>
+</form>
+<table class="table table-sm table-striped align-middle">
+  <thead><tr><th>Nombre</th><th>RUT</th><th>Email</th><th></th></tr></thead>
+  <tbody>
+  {% for c in page.object_list %}
+    <tr>
+      <td>{{ c.nombre }}</td><td>{{ c.rut }}</td><td>{{ c.email|default:"—" }}</td>
+      <td class="text-nowrap">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'ventas:cliente_update' c.id %}">Editar</a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'ventas:cliente_delete' c.id %}">Eliminar</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4">Sin clientes</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
