@@ -179,3 +179,12 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore.env
+# nunca subir variables locales
+.env
+.env.*
+# otros recomendados
+/db.sqlite3
+/staticfiles/
+/venv/
+/__pycache__/
+/*.py[cod]
